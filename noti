@@ -27,7 +27,7 @@ function notifications.notify(text, duration)
 	screenGui.Name = "NotificationGui"
 	screenGui.Parent = playerGui
 
-	local startingY = 332
+	local startingY = 332  
 	local yOffset = notificationIndex * 0.09
 	local positionY = startingY + yOffset
 
