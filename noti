@@ -3,11 +3,13 @@ local notifications = {}
 local TweenService = game:GetService("TweenService")
 local player = game.Players.LocalPlayer
 local notificationIndex = 0
+local startingX = 10
+local startingY = 10
+local gap = 10
 local notificationColor = Color3.fromRGB(30,30,30)
 local outlineColor = Color3.fromRGB(0,0,0)
 local notificationFont = Enum.Font.Gotham
 local activeNotifications = {}
-local gap = 0.08
 
 function notifications.setColor(color)
 	notificationColor = color
@@ -21,17 +23,23 @@ function notifications.setFont(font)
 	notificationFont = font
 end
 
+function notifications.setStartingPosition(x, y)
+	startingX = x
+	startingY = y
+end
+
 function notifications.notify(text, duration)
 	if not player or not player:FindFirstChild("PlayerGui") then return end
 	local playerGui = player:FindFirstChild("PlayerGui")
 	local screenGui = Instance.new("ScreenGui")
 	screenGui.Name = "NotificationGui"
 	screenGui.Parent = playerGui
-	local posY = 1 - (notificationIndex * gap)
+	local posY = startingY + notificationIndex * gap
+	local posX = startingX
 	local frame = Instance.new("Frame")
-	frame.AnchorPoint = Vector2.new(0.5,1)
+	frame.AnchorPoint = Vector2.new(0,0)
 	frame.Size = UDim2.new(0.25,0,0.07,0)
-	frame.Position = UDim2.new(0.5,0, posY, 0)
+	frame.Position = UDim2.new(0, posX, 0, posY)
 	frame.BackgroundColor3 = notificationColor
 	frame.BorderSizePixel = 0
 	frame.Parent = screenGui
@@ -52,7 +60,7 @@ function notifications.notify(text, duration)
 	textLabel.TextSize = 14
 	textLabel.TextWrapped = true
 	textLabel.Parent = frame
-	local tweenIn = TweenService:Create(frame, TweenInfo.new(0.5,Enum.EasingStyle.Quad,Enum.EasingDirection.Out), {Position = UDim2.new(0.5,0, posY, 0), Transparency = 0})
+	local tweenIn = TweenService:Create(frame, TweenInfo.new(0.5,Enum.EasingStyle.Quad,Enum.EasingDirection.Out), {Position = UDim2.new(0, posX, 0, posY), Transparency = 0})
 	tweenIn:Play()
 	table.insert(activeNotifications, {frame = frame, outline = outline, posY = posY, screenGui = screenGui})
 	notificationIndex = notificationIndex + 1
@@ -69,10 +77,10 @@ function notifications.notify(text, duration)
 				end
 			end
 			for i,notif in ipairs(activeNotifications) do
-				local newPosY = notif.posY + gap
-				local tweenSlide = TweenService:Create(notif.frame, TweenInfo.new(0.6,Enum.EasingStyle.Quad,Enum.EasingDirection.Out), {Position = UDim2.new(0.5,0,newPosY,0)})
+				local newY = notif.posY - gap
+				local tweenSlide = TweenService:Create(notif.frame, TweenInfo.new(0.6,Enum.EasingStyle.Quad,Enum.EasingDirection.Out), {Position = UDim2.new(0, posX, 0, newY)})
 				tweenSlide:Play()
-				notif.posY = newPosY
+				notif.posY = newY
 			end
 			screenGui:Destroy()
 			notificationIndex = notificationIndex - 1
