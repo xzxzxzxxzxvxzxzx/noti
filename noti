@@ -1,0 +1,102 @@
+local notifications = {}
+
+local TweenService = game:GetService("TweenService")
+local player = game.Players.LocalPlayer
+local notificationIndex = 0
+local notificationColor = Color3.fromRGB(30, 30, 30)
+local outlineColor = Color3.fromRGB(0, 0, 0)
+local notificationFont = Enum.Font.Gotham
+local activeNotifications = {}
+
+function notifications.setColor(color)
+	notificationColor = color
+end
+
+function notifications.setOutlineColor(color)
+	outlineColor = color
+end
+
+function notifications.setFont(font)
+	notificationFont = font
+end
+
+function notifications.notify(text, duration)
+	if not player or not player:FindFirstChild("PlayerGui") then return end
+	local playerGui = player:FindFirstChild("PlayerGui")
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = "NotificationGui"
+	screenGui.Parent = playerGui
+
+	local startingY = 332
+	local yOffset = notificationIndex * 0.09
+	local positionY = startingY + yOffset
+
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(0.25, 0, 0.07, 0)
+	frame.Position = UDim2.new(0, 0, 0, positionY)
+	frame.BackgroundColor3 = notificationColor
+	frame.BorderSizePixel = 0
+	frame.Parent = screenGui
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 5)
+	corner.Parent = frame
+
+	local outline = Instance.new("UIStroke")
+	outline.Thickness = 2
+	outline.Color = outlineColor
+	outline.Parent = frame
+
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Size = UDim2.new(1, -10, 1, 0)
+	textLabel.Position = UDim2.new(0, 5, 0, 0)
+	textLabel.Text = text
+	textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	textLabel.BackgroundTransparency = 1
+	textLabel.Font = notificationFont
+	textLabel.TextSize = 14
+	textLabel.TextWrapped = true
+	textLabel.Parent = frame
+
+	local tweenIn = TweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, positionY), Transparency = 0})
+	tweenIn:Play()
+
+	local tweenOutlineIn = TweenService:Create(outline, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Transparency = 0})
+	tweenOutlineIn:Play()
+
+	table.insert(activeNotifications, {frame = frame, outline = outline, positionY = positionY, screenGui = screenGui})
+
+	notificationIndex = notificationIndex + 1
+
+	task.delay(duration or 3, function()
+		local tweenOut = TweenService:Create(frame, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Transparency = 1})
+		tweenOut:Play()
+
+		local tweenOutlineOut = TweenService:Create(outline, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Transparency = 1})
+		tweenOutlineOut:Play()
+
+		tweenOut.Completed:Connect(function()
+			for i, notif in ipairs(activeNotifications) do
+				if notif.frame == frame then
+					table.remove(activeNotifications, i)
+					break
+				end
+			end
+
+			for i, notif in ipairs(activeNotifications) do
+				local newYPosition = notif.positionY - 0.09
+				local tweenSlideUp = TweenService:Create(notif.frame, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, newYPosition)})
+				tweenSlideUp:Play()
+
+				local tweenOutlineSlideUp = TweenService:Create(notif.outline, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Transparency = 0})
+				tweenOutlineSlideUp:Play()
+
+				notif.positionY = newYPosition
+			end
+
+			screenGui:Destroy()
+		end)
+	end)
+end
+
+return notifications
