@@ -6,27 +6,9 @@ local notificationIndex = 0
 local startingX = 10
 local startingY = 10
 local gap = 30
-local notificationColor = Color3.fromRGB(30,30,30)
-local outlineColor = Color3.fromRGB(0,0,0)
-local notificationFont = Enum.Font.Gotham
+local notificationColor = Color3.fromRGB(49,49,49)
+local notificationFont = Enum.Font.Arial
 local activeNotifications = {}
-
-function notifications.setColor(color)
-	notificationColor = color
-end
-
-function notifications.setOutlineColor(color)
-	outlineColor = color
-end
-
-function notifications.setFont(font)
-	notificationFont = font
-end
-
-function notifications.setStartingPosition(x, y)
-	startingX = x
-	startingY = y
-end
 
 function notifications.notify(text, duration)
 	if not player or not player:FindFirstChild("PlayerGui") then return end
@@ -38,18 +20,14 @@ function notifications.notify(text, duration)
 	local posX = startingX
 	local frame = Instance.new("Frame")
 	frame.AnchorPoint = Vector2.new(0,0)
-	frame.Size = UDim2.new(0.25,0,0.07,0)
+	frame.Size = UDim2.new(0.2,0,0.05,0)
 	frame.Position = UDim2.new(0, posX, 0, posY)
 	frame.BackgroundColor3 = notificationColor
 	frame.BorderSizePixel = 0
 	frame.Parent = screenGui
 	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0,5)
+	corner.CornerRadius = UDim.new(0,3)
 	corner.Parent = frame
-	local outline = Instance.new("UIStroke")
-	outline.Thickness = 2
-	outline.Color = outlineColor
-	outline.Parent = frame
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Size = UDim2.new(1,-10,1,0)
 	textLabel.Position = UDim2.new(0,5,0,0)
@@ -57,18 +35,16 @@ function notifications.notify(text, duration)
 	textLabel.TextColor3 = Color3.fromRGB(255,255,255)
 	textLabel.BackgroundTransparency = 1
 	textLabel.Font = notificationFont
-	textLabel.TextSize = 14
+	textLabel.TextSize = 12
 	textLabel.TextWrapped = true
 	textLabel.Parent = frame
 	local tweenIn = TweenService:Create(frame, TweenInfo.new(0.5,Enum.EasingStyle.Quad,Enum.EasingDirection.Out), {Position = UDim2.new(0, posX, 0, posY), Transparency = 0})
 	tweenIn:Play()
-	table.insert(activeNotifications, {frame = frame, outline = outline, posY = posY, screenGui = screenGui})
+	table.insert(activeNotifications, {frame = frame, posY = posY, screenGui = screenGui})
 	notificationIndex = notificationIndex + 1
 	task.delay(duration or 3, function()
 		local tweenOut = TweenService:Create(frame, TweenInfo.new(0.6,Enum.EasingStyle.Quart,Enum.EasingDirection.In), {Transparency = 1})
 		tweenOut:Play()
-		local tweenOutlineOut = TweenService:Create(outline, TweenInfo.new(0.6,Enum.EasingStyle.Quart,Enum.EasingDirection.In), {Transparency = 1})
-		tweenOutlineOut:Play()
 		tweenOut.Completed:Connect(function()
 			for i,notif in ipairs(activeNotifications) do
 				if notif.frame == frame then
