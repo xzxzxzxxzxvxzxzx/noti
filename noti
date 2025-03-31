@@ -5,9 +5,10 @@ local player = game.Players.LocalPlayer
 local notificationIndex = 0
 local startingX = 10
 local startingY = 10
-local gap = 30
+local gap = 20
 local notificationColor = Color3.fromRGB(49,49,49)
-local notificationFont = Enum.Font.Arial
+local accentColor = Color3.fromRGB(255, 85, 85)
+local notificationFont = Enum.Font.Gotham
 local activeNotifications = {}
 
 function notifications.notify(text, duration)
@@ -20,23 +21,30 @@ function notifications.notify(text, duration)
 	local posX = startingX
 	local frame = Instance.new("Frame")
 	frame.AnchorPoint = Vector2.new(0,0)
-	frame.Size = UDim2.new(0.2,0,0.05,0)
+	frame.Size = UDim2.new(0.22,0,0.08,0)
 	frame.Position = UDim2.new(0, posX, 0, posY)
 	frame.BackgroundColor3 = notificationColor
 	frame.BorderSizePixel = 0
 	frame.Parent = screenGui
 	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0,3)
+	corner.CornerRadius = UDim.new(0,4)
 	corner.Parent = frame
+	local accent = Instance.new("Frame")
+	accent.Size = UDim2.new(0, 5, 1, 0)
+	accent.Position = UDim2.new(0, 0, 0, 0)
+	accent.BackgroundColor3 = accentColor
+	accent.BorderSizePixel = 0
+	accent.Parent = frame
 	local textLabel = Instance.new("TextLabel")
-	textLabel.Size = UDim2.new(1,-10,1,0)
-	textLabel.Position = UDim2.new(0,5,0,0)
+	textLabel.Size = UDim2.new(1,-15,1,0)
+	textLabel.Position = UDim2.new(0,10,0,0)
 	textLabel.Text = text
 	textLabel.TextColor3 = Color3.fromRGB(255,255,255)
 	textLabel.BackgroundTransparency = 1
 	textLabel.Font = notificationFont
-	textLabel.TextSize = 12
+	textLabel.TextSize = 11
 	textLabel.TextWrapped = true
+	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.Parent = frame
 	local tweenIn = TweenService:Create(frame, TweenInfo.new(0.5,Enum.EasingStyle.Quad,Enum.EasingDirection.Out), {Position = UDim2.new(0, posX, 0, posY), Transparency = 0})
 	tweenIn:Play()
